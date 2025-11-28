@@ -1,235 +1,310 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" 
     pageEncoding="UTF-8" 
     session="true" 
-    import="com.productos.seguridad.Pagina" %><%@ page import="com.productos.seguridad.Bitacora" %>
+    import="com.productos.seguridad.Pagina" %>
+<%@ page import="com.productos.seguridad.Bitacora" %>
     
 <%
-    // Obtenemos AMBOS atributos de la sesión
+    // --- LÓGICA DE SESIÓN ---
     String usuario = (String) session.getAttribute("usuario");
     Integer perfil = (Integer) session.getAttribute("perfil");
 
-    // Bandera para saber si el usuario está logueado
     boolean logueado = (usuario != null && perfil != null);
 
-    // Variables de navegación, se calcularán solo si es necesario.
+    // Variables de navegación para marcar activo
     String paginaActual = request.getRequestURI();
     boolean esProductos = paginaActual.endsWith("productos.jsp");
     boolean esCarrito = paginaActual.endsWith("carrito.jsp");
+    boolean esServicios = paginaActual.endsWith("servicios.jsp");
 %>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>MediVital - HOSPITAL PRIVADO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediVital - Tu Hospital de Confianza</title>
 
-    <link rel="stylesheet" href="estilos3.css" type="text/css">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
     <style>
-        /* [ ... Tu CSS existente permanece sin cambios ... ] */
+        /* --- ESTILOS PERSONALIZADOS --- */
         body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f4f6f9;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
             color: #333;
+            overflow-x: hidden;
         }
 
-        header {
-            background: linear-gradient(135deg, #007bff, #00c6ff);
-            color: white;
-            text-align: center;
-            padding: 30px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        /* Navbar */
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            backdrop-filter: blur(10px);
         }
-        header .logo {
-            width: 120px;
-            border-radius: 50%;
-            border: 2px solid white;
-            margin-bottom: 10px;
+        .navbar-brand {
+            font-weight: 700;
+            color: #007bff !important;
+            font-size: 1.5rem;
         }
-        header h1 { font-size: 2.5em; margin: 0; }
-        header h2 { font-size: 1.2em; font-weight: 400; }
-
-        nav {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #ffffff;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            min-height: 60px;
-            gap: 15px;
+        .nav-link {
+            font-weight: 500;
+            color: #555 !important;
+            margin: 0 5px;
+            transition: color 0.3s;
         }
-        nav a, nav form button {
-            text-decoration: none;
-            color: #007bff;
-            padding: 15px 25px;
-            font-weight: 600;
-            transition: all 0.3s;
-            background: none;
-            border: none;
-            font-family: inherit;
-            cursor: pointer;
+        .nav-link:hover, .nav-link.active {
+            color: #007bff !important;
         }
-        nav a:hover, nav a.active, nav form button:hover {
-            background-color: #007bff;
-            color: white;
-            border-radius: 8px;
-        }
-        .login-btn {
+        .btn-login {
             background-color: #28a745;
             color: white !important;
-            border-radius: 12px;
-            margin-left: 15px;
+            border-radius: 50px;
+            padding: 8px 25px;
+            font-weight: 600;
             transition: all 0.3s;
         }
-        .logout-btn {
+        .btn-login:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+        .btn-logout {
             background-color: #dc3545;
             color: white !important;
-            border-radius: 12px;
-            margin-left: 15px;
-            transition: all 0.3s;
-        }
-        .logout-btn:hover { background-color: #a71d2a; }
-
-        .welcome-msg {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-size: 1.1em;
-            color: #007bff;
-            font-weight: bold;
-            margin-left: 20px;
+            border-radius: 50px;
+            padding: 6px 20px;
+            border: none;
         }
 
-        section, article {
-            padding: 40px 20px;
-            max-width: 1200px;
-            margin: auto;
+        /* Hero Section */
+        .hero-header {
+            background: linear-gradient(135deg, #0062cc, #00c6ff);
+            color: white;
+            padding: 80px 0 60px;
+            border-bottom-left-radius: 50% 30px;
+            border-bottom-right-radius: 50% 30px;
+            margin-bottom: 50px;
+            position: relative;
         }
-        h3, h4 { color: #007bff; }
-        article p { font-size: 1.1em; line-height: 1.6; }
-        .mapa {
-            width: 100%;
-            max-width: 800px;
-            height: 450px;
+        .logo-main {
+            width: 140px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            background: white;
+            padding: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Cards */
+        .custom-card {
+            border: none;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+            height: 100%;
+        }
+        .custom-card:hover {
+            transform: translateY(-5px);
+        }
+        .map-container iframe {
             border-radius: 15px;
-            margin-top: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            width: 100%;
+            height: 350px;
+            border: none;
         }
-        .mascota-section {
-            display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
-            background: linear-gradient(135deg, #ffffff, #e9f7ff);
-            padding: 60px 20px; margin-top: 40px; border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); gap: 40px;
+
+        /* Mascota Section */
+        .mascota-img {
+            width: 100%;
+            max-width: 350px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            transform: rotate(-2deg);
+            transition: transform 0.3s;
         }
-        .mascota-section img {
-            width: 300px; border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        .mascota-img:hover {
+            transform: rotate(0deg) scale(1.02);
         }
-        .mascota-text { max-width: 500px; }
-        .mascota-text h3 { font-size: 2em; margin-bottom: 20px; }
-        .mascota-text p { font-size: 1.1em; line-height: 1.6; }
-        .social-links {
-            display: flex; gap: 20px; margin-top: 20px;
-        }
-        .social-links a {
-            display: inline-block; background-color: #007bff; color: white;
-            padding: 12px 25px; border-radius: 12px;
-            font-size: 1.1em; font-weight: 600;
-            text-decoration: none; transition: all 0.3s;
-        }
-        .social-links a:hover { background-color: #0056b3; }
+
+        /* Footer */
         footer {
-            text-align: center; padding: 20px;
-            background: #007bff; color: white;
+            background-color: #343a40;
+            color: rgba(255,255,255,0.7);
+            padding: 40px 0 20px;
+            margin-top: 80px;
         }
+
+        /* Asistente Flotante */
         .spider-container {
-            position: fixed; bottom: 20px; right: 20px;
-            width: 150px; height: 150px; z-index: 1000;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
         }
-        .dialogo {
-            position: absolute; bottom: 160px; right: 0;
-            background-color: #444; color: white;
-            padding: 10px 15px; border-radius: 12px;
-            font-size: 0.9em; box-shadow: 0 0 10px rgba(0,0,0,0.3);
-            width: 180px; text-align: center;
+        .dialogo-box {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 15px 15px 0 15px;
+            position: absolute;
+            bottom: 140px;
+            right: 20px;
+            width: 200px;
+            font-size: 0.9rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            animation: fadeIn 0.5s ease-in-out;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-    <main>
-        <header>
-            <img src="../image/logo.PNG" alt="Logo MediVital" class="logo">
-            <h1>MediVital</h1>
-            <h2 class="destacado">Cuidamos tu bienestar y recuperación física</h2>
-        </header>
 
-        <nav>
-            <% if (logueado) { %>
-                <div class="welcome-msg">👋 Bienvenido, <%= usuario %>!</div>
-                <%
-                    Pagina pag = new Pagina();
-                    String menu = pag.mostrarMenu(perfil); // Llama a la BD
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="../image/logo.PNG" alt="Logo" width="40" height="40" class="rounded-circle me-2">
+                MediVital
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <% if (logueado) { %>
+                        <li class="nav-item me-3 text-primary fw-bold">
+                            👋 ¡Hola, <%= usuario %>!
+                        </li>
+                        
+                        <%
+                            Pagina pag = new Pagina();
+                            String menu = pag.mostrarMenu(perfil);
+                            // Pequeña limpieza por si la BD trae hrefs con espacios
+                            out.print(menu); 
+                        %>
 
-                    // Marcar como activo el enlace de index si está presente
-                    if (menu.contains("index.jsp")) {
-                         menu = menu.replace("href=index.jsp", "href=index.jsp class='active'");
-                    }
-                    out.print(menu);
-                %>
-                <a href="productos.jsp" class="nav-link <%= esProductos ? "active" : "" %>">Productos</a>
-                <a href="carrito.jsp" class="nav-link <%= esCarrito ? "active" : "" %>">🛒 Carrito</a>
+                        <li class="nav-item"><a class="nav-link <%= esServicios ? "active" : "" %>" href="servicios.jsp">Servicios</a></li>
+                        <li class="nav-item"><a class="nav-link <%= esProductos ? "active" : "" %>" href="productos.jsp">Productos</a></li>
+                        <li class="nav-item"><a class="nav-link <%= esCarrito ? "active" : "" %>" href="carrito.jsp">🛒 Carrito</a></li>
+                        
+                        <li class="nav-item ms-2">
+                            <form action="logout.jsp" method="post" class="d-inline">
+                                <button type="submit" class="btn-logout">Salir</button>
+                            </form>
+                        </li>
+                    <% } else { %>
+                        <li class="nav-item"><a class="nav-link active" href="index.jsp">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link <%= esServicios ? "active" : "" %>" href="servicios.jsp">Servicios</a></li>
+                        <li class="nav-item"><a class="nav-link <%= esProductos ? "active" : "" %>" href="productos.jsp">Productos</a></li>
+                        <li class="nav-item"><a class="nav-link <%= esCarrito ? "active" : "" %>" href="carrito.jsp">🛒 Carrito</a></li>
+                        <li class="nav-item ms-3">
+                            <a href="login.jsp" class="btn btn-login">Iniciar Sesión</a>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-                <form action="logout.jsp" method="post" style="margin-left:auto;">
-                    <button type="submit" class="logout-btn">Cerrar sesión</button>
-                </form>
-            <% } else { %>
-                <a href="index.jsp" class="nav-link active">Inicio</a>
-                <a href="productos.jsp" class="nav-link <%= esProductos ? "active" : "" %>">Productos</a>
-                <a href="carrito.jsp" class="nav-link <%= esCarrito ? "active" : "" %>">🛒 Carrito</a>
-                
-                <a href="login.jsp" class="login-btn" style="margin-left:auto;">Iniciar Sesión</a>
-            <% } %>
-        </nav>
+    <header class="hero-header text-center">
+        <div class="container mt-5">
+            <img src="../image/logo.PNG" alt="Logo MediVital" class="logo-main">
+            <h1 class="display-4 fw-bold">Bienvenido a MediVital</h1>
+            <p class="lead fs-4 opacity-75">Innovación médica y calidez humana para tu recuperación.</p>
+        </div>
+    </header>
 
-        <section>
-            <article>
-                <h3>Nuestra misión</h3>
-                <p>
-                    En <strong>MediVital</strong> trabajamos para mejorar la salud física de nuestros pacientes mediante tratamientos personalizados, tecnología avanzada y atención profesional.
-                </p>
-                <iframe src="https://www.google.com/maps/d/embed?mid=1FwoQrdvLqxbV2QAQju9fUbjOLioz6UE&ehbc=2E312F"
-                        class="mapa"></iframe>
-            </article>
-        </section>
-
-        <section class="mascota-section">
-            <img src="../image/image.jpg" alt="Mascota MediVital">
-            <div class="mascota-text">
-                <h3>Conoce a nuestra mascota</h3>
-                <p><strong>Misión:</strong> Brindar atención médica integral y personalizada, utilizando tecnología avanzada para la recuperación y bienestar de nuestros pacientes.</p>
-                <p><strong>Visión:</strong> Ser líderes en innovación médica y rehabilitación, creando un entorno seguro, humano y de confianza para todos nuestros pacientes.</p>
-                
-                <div class="social-links">
-                    <a href="https://www.instagram.com/davosaurio._/" target="_blank">Instagram</a>
-                    <a href="https://www.facebook.com/share/19zk6vH4eE/" target="_blank">Facebook</a>
+    <div class="container">
+        
+        <div class="row align-items-center mb-5 g-4">
+            <div class="col-lg-5">
+                <div class="custom-card p-4 h-100 d-flex flex-column justify-content-center">
+                    <h3 class="text-primary fw-bold mb-3">Nuestra Misión</h3>
+                    <p class="text-muted fs-5">
+                        En <strong>MediVital</strong> trabajamos incansablemente para mejorar la calidad de vida de nuestros pacientes. 
+                        Combinamos tratamientos personalizados con tecnología de vanguardia y un equipo humano altamente capacitado.
+                    </p>
+                    <div class="mt-3">
+                        <a href="servicios.jsp" class="btn btn-outline-primary rounded-pill">Conoce nuestros servicios</a>
+                    </div>
                 </div>
             </div>
-        </section>
-
-        <footer>
-            <p>© 2025 MediVital - HOSPITAL PRIVADO</p>
-        </footer>
-
-        <div class="spider-container">
-            <div class="dialogo">¿Te puedo ayudar en algo?</div>
-            <model-viewer src="../image/cute_shark_animated_character.glb" alt="Asistente virtual"
-                          auto-rotate camera-controls
-                          style="width:150px; height:150px;">
-            </model-viewer>
+            <div class="col-lg-7">
+                <div class="custom-card p-2 map-container">
+                    <iframe src="https://www.google.com/maps/d/embed?mid=1FwoQrdvLqxbV2QAQju9fUbjOLioz6UE&ehbc=2E312F" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
         </div>
-    </main>
+
+        <div class="custom-card p-5 mb-5 bg-white position-relative overflow-hidden">
+            <div style="position:absolute; top:-50px; right:-50px; width:200px; height:200px; background:#e9f7ff; border-radius:50%; z-index:0;"></div>
+            
+            <div class="row align-items-center position-relative" style="z-index:1;">
+                <div class="col-md-5 text-center mb-4 mb-md-0">
+                    <img src="../image/image.jpg" alt="Mascota MediVital" class="mascota-img">
+                </div>
+                <div class="col-md-7">
+                    <span class="badge bg-info text-dark mb-2">Nuestro Espíritu</span>
+                    <h2 class="fw-bold mb-3">Conoce a nuestra mascota</h2>
+                    
+                    <div class="mb-4">
+                        <h5 class="text-primary">Misión</h5>
+                        <p class="text-muted small">Brindar atención médica integral y personalizada, utilizando tecnología avanzada para la recuperación y bienestar de nuestros pacientes.</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="text-primary">Visión</h5>
+                        <p class="text-muted small">Ser líderes en innovación médica y rehabilitación, creando un entorno seguro, humano y de confianza.</p>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <a href="https://www.instagram.com/davosaurio._/" target="_blank" class="btn btn-primary rounded-pill px-4">
+                             Instagram
+                        </a>
+                        <a href="https://www.facebook.com/share/19zk6vH4eE/" target="_blank" class="btn btn-outline-primary rounded-pill px-4">
+                             Facebook
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="spider-container">
+        <div class="dialogo-box text-center">
+            <strong>Asistente Virtual</strong><br>
+            ¿Te puedo ayudar en algo hoy? 😊
+        </div>
+        <model-viewer 
+            src="../image/cute_shark_animated_character.glb" 
+            alt="Asistente virtual"
+            auto-rotate 
+            camera-controls 
+            disable-zoom
+            style="width: 140px; height: 140px;">
+        </model-viewer>
+    </div>
+
+    <footer class="text-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <h5>MediVital - Hospital Privado</h5>
+                    <p class="small text-white-50">Comprometidos con tu salud y la de tu familia.</p>
+                    <p class="mt-4 mb-0">© 2025 Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

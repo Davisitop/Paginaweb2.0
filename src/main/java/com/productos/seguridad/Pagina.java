@@ -20,7 +20,8 @@ public class Pagina {
     public void setPath(String path) { this.path = path; }
 
     /**
-     * Construye el menú HTML consultando la base de datos.
+     * Construye el menú HTML adaptado para la Navbar de Bootstrap.
+     * Devuelve elementos <li> en lugar de solo <a>.
      */
     public String mostrarMenu(Integer nperfil) {
         String menu = "";
@@ -30,30 +31,35 @@ public class Pagina {
                 + "AND pper.id_per= " + nperfil;
 
         Conexion con = new Conexion();
-        Connection cn = null; // Objeto Connection
-        Statement st = null;  // Objeto Statement
-        ResultSet rs = null;  // Objeto ResultSet
+        Connection cn = null;
+        Statement st = null;
+        ResultSet rs = null;
         
         try {
-            cn = con.getConexion(); // Obtenemos la conexión
+            cn = con.getConexion();
             if (cn != null) {
-                st = cn.createStatement(); // Creamos el Statement
-                rs = st.executeQuery(sql); // Ejecutamos la consulta
+                st = cn.createStatement();
+                rs = st.executeQuery(sql);
 
                 while (rs.next()) {
-                    // Aplicamos el estilo de tu <nav>
-                    menu += "<a href=\"" + rs.getString("path_pag") + "\">" 
-                         + rs.getString("descripcion_pag") + "</a> ";
+                    // --- CAMBIO AQUÍ ---
+                    // Envolvemos el enlace en un <li> con la clase 'nav-item'
+                    // Y al enlace <a> le ponemos la clase 'nav-link'
+                    menu += "<li class='nav-item'>"
+                          + "<a class='nav-link' href='" + rs.getString("path_pag") + "'>" 
+                          + rs.getString("descripcion_pag") + "</a>"
+                          + "</li>";
                 }
             } else {
                 System.out.println("Error en mostrarMenu: La conexión es nula.");
-                menu = "Error: Sin conexión a BD.";
+                // Opcional: devolver un li de error si quieres verlo en pantalla
+                menu = "<li class='nav-item'><span class='nav-link text-danger'>Sin conexión</span></li>";
             }
         } catch (SQLException e) {
             System.out.print("Error en mostrarMenu: " + e.getMessage());
-            menu = "Error: " + e.getMessage(); // Muestra el error en el menú
+            menu = "<li class='nav-item'><span class='nav-link text-danger'>Error DB</span></li>";
         } finally {
-            // --- CERRAMOS TODO (MUY IMPORTANTE) ---
+            // Cerrar recursos
             try {
                 if (rs != null) rs.close();
                 if (st != null) st.close();
